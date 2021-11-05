@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using TMPro;
 using Wrj;
 
@@ -10,7 +11,9 @@ public class GateCollider : MonoBehaviour
     private TextMeshPro text;
     private MathBehavior mathBehavior;
 
-    public void SetMath(MathFunction function, int value)
+    public UnityAction OnPassed;
+
+    public void SetMath(MathBehavior.MathFunction function, int value)
     {
         mathBehavior = new MathBehavior(function, value);
         RefreshLabel();
@@ -31,10 +34,18 @@ public class GateCollider : MonoBehaviour
     }
     public void RefreshColor()
     {
-        transform.Color(Utils.RandomBrightColor, .25f);
+        SetColor(Utils.RandomBrightColor);
+    }
+    public void SetColor(Color color)
+    {
+        transform.Color(color, .25f);
     }
     public int PerformMath(int input)
     {
         return mathBehavior.PerformFunction(input);
+    }
+    public void ReportPassage()
+    {
+        OnPassed();
     }
 }

@@ -10,11 +10,40 @@ public class BoolGate : MonoBehaviour
     [SerializeField]
     private GateCollider _right;
     
-    // Start is called before the first frame update
     void Start()
     {
-        _left.SetMath(MathBehavior.RandomMath(10));
-        _right.SetMath(MathBehavior.RandomMath(10));
+        _left.OnPassed += UpdatePosition;
+        _right.OnPassed += UpdatePosition;
+        Reset();
+    }
+    private void UpdatePosition()
+    {
+        Utils.DeferredExecution(.2f, () => 
+        {
+            transform.localPosition = transform.LocalPosInDir(forward:90f);
+            Reset();
+        });
+    }
+    private void Reset()
+    {
+        Color randCol = Utils.RandomBrightColor;
+        Color oppCol = ColorHarmony.Complementary(randCol);
+        MathBehavior.MathFunction[] randFunc;
+        MathBehavior.MathFunction[] oppFunc;
+        if (Utils.CoinFlip)
+        {
+            randFunc = MathBehavior.additiveFunctions;
+            oppFunc = MathBehavior.subtractiveFunctions;
+        }
+        else
+        {
+            randFunc = MathBehavior.subtractiveFunctions;
+            oppFunc = MathBehavior.additiveFunctions;
+        }
+        _left.SetMath(new MathBehavior(10, randFunc));
+        _left.SetColor(randCol);
+        _right.SetMath(new MathBehavior(10, oppFunc));
+        _right.SetColor(oppCol);
     }
 }
 

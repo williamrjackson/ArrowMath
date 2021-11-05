@@ -7,10 +7,22 @@ public class MathBehavior
 {
     public MathFunction function;
     public int value;
+
+    public static MathFunction[] subtractiveFunctions => new MathFunction[] {MathFunction.Divide, MathFunction.Subtract};
+    public static MathFunction[] additiveFunctions => new MathFunction[] {MathFunction.Multiply, MathFunction.Add};
+    public static MathFunction[] allMathFunctions => new MathFunction[] {MathFunction.Divide, MathFunction.Subtract, MathFunction.Multiply, MathFunction.Add };
     public MathBehavior(MathFunction function, int value)
     {
         this.function = function;
         this.value = value;
+    }
+    public MathBehavior(int max, MathFunction[] fromFunctions = null)
+    {
+        // if no fromFunctions, choose from all.
+        if (fromFunctions == null) fromFunctions = allMathFunctions;
+
+        this.function = fromFunctions.GetRandom();
+        this.value = Random.Range(1, max+1);
     }
     public int PerformFunction(int input)
     {
@@ -47,17 +59,12 @@ public class MathBehavior
         result += $"{value}";
         return result;
     }
-    public static MathBehavior RandomMath(int max)
+
+    public enum MathFunction
     {
-        Array functionValues = Enum.GetValues(typeof(MathFunction));
-        MathFunction func = (MathFunction)functionValues.GetValue(Random.Range(0, functionValues.Length));
-        return new MathBehavior(func, Random.Range(1, max+1));
+        Divide,
+        Multiply,
+        Subtract,
+        Add
     }
-}
-public enum MathFunction
-{
-    Divide,
-    Multiply,
-    Subtract,
-    Add
 }

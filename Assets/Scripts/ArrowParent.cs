@@ -31,10 +31,25 @@ public class ArrowParent : MonoBehaviour
     }
     private void Start()
     {
+        GameManager.Instance.StateHasChanged += (() => 
+        {
+            Debug.Log($"New State: {GameManager.CurrentState}");
+            if (GameManager.CurrentState == GameManager.GameState.GameOverMenu)
+            {
+                SceneManagement.ReloadScene();
+            }
+        });
+        
         UpdateChildCount(1);
     }
     private void UpdateChildCount(int count)
     {
+        count = Mathf.Max(count, 0);
+        if (count == 0)
+        {
+            GameManager.CurrentState = GameManager.GameState.GameOverMenu;
+            return;
+        } 
         var activeArrows = pool.ActiveObjects;
         if (activeArrows.Count > count)
         {
@@ -59,6 +74,7 @@ public class ArrowParent : MonoBehaviour
         if (gate != null)
         {
             UpdateChildCount(gate.PerformMath(pool.ActiveObjects.Count));
+            gate.ReportPassage();
         }
     }
 
@@ -70,8 +86,9 @@ public class ArrowParent : MonoBehaviour
         mousePos = Input.mousePosition;
         if (Input.GetMouseButtonDown(0))
         {
-            Debug.Log("Down");
+            // Debug.Log("Down");
             draggingMousePos = mousePos;
+            GameManager.CurrentState = GameManager.GameState.Playing;
         }
         else if (Input.GetMouseButton(0))
         {
@@ -79,7 +96,7 @@ public class ArrowParent : MonoBehaviour
         }
         else {return;}
         var delta = (mousePos - draggingMousePos) * speed;
-        Debug.Log($"Delta: {delta}");
+        // Debug.Log($"Delta: {delta}");
         Vector3 target = transform.LocalPosInDir(up: delta.y, right: delta.x);
         float xLimit = Mathf.Abs(positionBoundaries.x);
         float yLimit = Mathf.Abs(positionBoundaries.y);
